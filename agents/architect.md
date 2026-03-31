@@ -29,12 +29,75 @@ Do not rely on memorized version numbers — verify via Context7 first.
 
 Produce the complete directory and file tree for the project. Every file that will exist at the end of the build must appear here — including source files, config files, test files, and asset placeholders.
 
-Use this structure as a baseline and adapt it to the chosen framework:
+Use this structure as a baseline and adapt it to the chosen framework.
+
+**CRITICAL — Expo Entry Point Rule:**
+
+Choose ONE routing approach. Do NOT mix them:
+
+- **Expo Router** (recommended for most apps): File-based routing via `app/` directory. Entry point is `"main": "expo-router/entry"` in `package.json`. Do NOT create `index.ts`, `App.tsx`, or `src/navigation/` — Expo Router handles all routing via the file system.
+- **React Navigation** (manual setup): Classic `index.ts` → `registerRootComponent(App)` pattern with `src/navigation/` directory. Do NOT create an `app/` directory.
+
+If you choose Expo Router, the `app.json` must include `"scheme"` for deep linking and the project must NOT have a conflicting `index.ts` or `App.tsx` that calls `registerRootComponent`.
+
+**Expo Router baseline (recommended):**
 
 ```
 /
 ├── app.json
-├── package.json
+├── package.json          ← "main": "expo-router/entry"
+├── tsconfig.json
+├── babel.config.js
+├── jest.config.js
+├── .eslintrc.js
+├── .prettierrc
+├── app/                  ← Expo Router file-based routing
+│   ├── _layout.tsx       ← Root layout (providers, theme, auth gate)
+│   ├── (auth)/           ← Auth group
+│   │   ├── _layout.tsx
+│   │   ├── sign-in.tsx
+│   │   └── sign-up.tsx
+│   ├── (tabs)/           ← Main tab group
+│   │   ├── _layout.tsx   ← Tab navigator config
+│   │   ├── index.tsx     ← First tab (home)
+│   │   └── [tab-name].tsx
+│   └── [screen-name]/    ← Stack screens
+│       └── index.tsx
+├── src/
+│   ├── components/
+│   │   └── [ComponentName]/
+│   │       ├── index.tsx
+│   │       └── [ComponentName].test.tsx
+│   ├── hooks/
+│   ├── store/
+│   │   ├── index.ts
+│   │   └── slices/
+│   ├── services/
+│   │   ├── api.ts
+│   │   └── storage.ts
+│   ├── utils/
+│   ├── theme/
+│   │   ├── tokens.ts
+│   │   ├── theme.ts
+│   │   └── index.ts
+│   ├── types/
+│   │   └── index.ts
+│   └── assets/
+│       ├── images/
+│       └── icons/
+├── __tests__/
+│   └── integration/
+└── e2e/
+```
+
+**React Navigation baseline (only if Expo Router is not suitable):**
+
+```
+/
+├── app.json
+├── package.json          ← "main": "index.ts"
+├── index.ts              ← registerRootComponent(App)
+├── App.tsx               ← Root component with providers
 ├── tsconfig.json
 ├── babel.config.js
 ├── jest.config.js
@@ -149,20 +212,61 @@ List every npm package required with:
 - **Next.js projects:** Pin `next`, `react`, and `react-dom` to compatible versions. Use `~` for tightly-coupled packages (e.g., `@next/font`, `eslint-config-next`).
 - **All projects:** Verify that every Expo config plugin listed in `app.json` actually ships a plugin export in the specified package version. If a package does not have an `app.plugin.js` or plugin export, do NOT add it to the `plugins` array — use its React provider pattern instead.
 
+**Expo Build Mode Rule (CRITICAL):**
+
+Read `build_mode` from `01-plan.json`. It is either `"expo-go"` (default) or `"dev-build"`.
+
+**If `build_mode: "expo-go"`:**
+
+All packages MUST work in Expo Go. If a package contains custom native code (TurboModules, Fabric components, custom Objective-C/Swift/Java/Kotlin), it will crash at runtime with `TurboModuleRegistry.getEnforcing(...) could not be found`.
+
+Known packages that REQUIRE a dev build — DO NOT USE in Expo Go mode:
+- `react-native-onesignal` → use `expo-notifications`
+- `@react-native-firebase/*` → use Expo's Firebase-compatible alternatives
+- `react-native-ble-plx` → no Expo Go alternative (requires dev build)
+- `react-native-vision-camera` → use `expo-camera`
+- `react-native-health` / `react-native-healthkit` → requires dev build
+- `@stripe/stripe-react-native` → use RevenueCat JS SDK or `expo-in-app-purchases`
+- `react-native-biometrics` → use `expo-local-authentication`
+- `react-native-keychain` → use `expo-secure-store`
+- `react-native-sqlite-storage` → use `expo-sqlite`
+- Any package whose setup docs mention `pod install` or `react-native link`
+
+Expo Go-compatible alternatives:
+| Need | Use | NOT |
+|------|-----|-----|
+| Push notifications | `expo-notifications` | OneSignal, Firebase Messaging |
+| Camera | `expo-camera` | react-native-vision-camera |
+| Maps | `react-native-maps` (built into Expo Go) | custom native map libs |
+| Payments | RevenueCat JS SDK, `expo-in-app-purchases` | @stripe/stripe-react-native |
+| Auth | `expo-auth-session` + `expo-web-browser` | native Firebase Auth |
+| Biometrics | `expo-local-authentication` | react-native-biometrics |
+| Secure storage | `expo-secure-store` | react-native-keychain |
+| SQLite | `expo-sqlite` | react-native-sqlite-storage |
+
+**If `build_mode: "dev-build"`:**
+
+Any React Native package is allowed, including those with custom native modules. The preview skill will use `npx expo prebuild` + `npx expo run:ios` instead of Expo Go.
+
+**In `03-architecture.json`**, add:
+```json
+"build_mode": "expo-go" | "dev-build"
+```
+
 Categories to cover:
 - Navigation (e.g., `@react-navigation/native`, `@react-navigation/bottom-tabs`, `@react-navigation/stack`)
 - State management (choose ONE from: Zustand, Redux Toolkit, Jotai, or Context+useReducer — justify the choice based on app complexity from `01-plan.json`)
 - Data fetching / server state (TanStack Query if there is a backend; omit if local-only)
 - Storage (AsyncStorage, MMKV, or SQLite — justify choice based on data model complexity)
-- Authentication (if applicable: Supabase, Firebase, or custom JWT)
+- Authentication (if applicable: Supabase, Firebase, or custom JWT — prefer `expo-auth-session` for Expo Go compatibility)
 - Forms (React Hook Form if there are 3+ form screens; plain controlled inputs otherwise)
 - Animation (Reanimated 3 + Gesture Handler if the design has custom animations; Animated API if not)
 - Testing (Jest, React Native Testing Library, Maestro for E2E)
 - Linting / formatting (ESLint with React Native config, Prettier)
 - Icons (icon library chosen in design system)
-- Payments (RevenueCat if subscription monetisation; Stripe if one-time)
+- Payments (RevenueCat if subscription monetisation; Stripe if one-time — prefer RevenueCat JS SDK for Expo Go compatibility)
 - Analytics (PostHog or Amplitude — one only, no double-tracking)
-- Push notifications (Expo Notifications or React Native Firebase Messaging)
+- Push notifications (`expo-notifications` — NOT OneSignal or Firebase Messaging unless dev build is explicitly chosen)
 - Accessibility (@testing-library/react-native built-in a11y queries — no extra package needed)
 
 ### 3. Navigation Graph

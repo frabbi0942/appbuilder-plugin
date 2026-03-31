@@ -61,6 +61,26 @@ Present the options and STOP:
 
 Wait for the user's choice. Confirm back: "Got it — building as an **Expo** app."
 
+### Step 2b — Build Mode (Expo only, BLOCKING)
+
+If the user chose Expo, ask:
+
+> **Step 2b — Build Mode**
+>
+> How do you want to run the app during development?
+>
+> 1. **Expo Go** — Scan a QR code and run instantly on your phone. No Xcode/Android Studio needed. Some native libraries are unavailable. *(default)*
+> 2. **Development Build** — Full native access (OneSignal, Stripe native, custom modules). Requires Xcode (iOS) or Android Studio (Android).
+>
+> *(Type 1 or 2, or press Enter for Expo Go)*
+
+Wait for the user's choice. Store this as `build_mode: "expo-go" | "dev-build"`.
+
+- If **Expo Go**: Tell the architect to only use Expo Go-compatible packages. Pass `build_mode: "expo-go"` to the planner.
+- If **Development Build**: The architect can use any React Native package. Pass `build_mode: "dev-build"` to the planner. The preview skill will use `npx expo prebuild` + `npx expo run:ios` instead of Expo Go.
+
+Confirm: "Got it — targeting **Expo Go** (instant QR code testing)." or "Got it — targeting a **Development Build** (full native access)."
+
 ---
 
 ## Step 3 — Interactive Planning (BLOCKING — 6 topics, strictly sequential)

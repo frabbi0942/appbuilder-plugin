@@ -87,10 +87,23 @@ Wait for installation to complete. If it fails, report the error and stop.
 Execute the appropriate start command based on the platform detected:
 
 **Expo (React Native):**
-```bash
-cd <project-path>
-npx expo start
-```
+
+First check the build mode by reading `03-architecture.json` for the `build_mode` field:
+
+- If `build_mode: "expo-go"` (or field absent — default):
+  ```bash
+  cd <project-path>
+  npx expo start
+  ```
+  Instruct the user to scan the QR code with Expo Go.
+
+- If `build_mode: "dev-build"`:
+  ```bash
+  cd <project-path>
+  npx expo prebuild
+  npx expo run:ios   # or npx expo run:android
+  ```
+  Inform the user: "This app uses a Development Build (native modules that require Xcode/Android Studio). Building now — this takes longer than Expo Go but gives full native access."
 
 If using isolation, prepend the appropriate command (e.g., `packnplay run npx expo start` or Docker equivalent).
 

@@ -25,6 +25,39 @@ If the Context7 MCP is available, query it before writing code that imports thir
 
 Do not guess import paths or API signatures — verify via Context7 first.
 
+## Project Scaffolding (BEFORE any code)
+
+After reading all inputs, scaffold the project foundation in this order:
+
+### 1. Write `package.json` from `03-architecture.json`
+
+Create `package.json` with all packages from the architecture's package manifest.
+
+### 2. Fix SDK Compatibility (Expo projects — MANDATORY)
+
+Immediately after writing `package.json`, run:
+
+```bash
+npx expo install --fix --legacy-peer-deps
+```
+
+This auto-corrects ALL package versions to match the Expo SDK. Do NOT skip this step. Do NOT manually pick versions for `expo-*` packages, `react`, `react-dom`, `react-native`, `jest`, `@types/react`, `eslint-config-expo`, or any other SDK-coupled package — let `expo install --fix` set the correct versions.
+
+**Why:** The architect may specify `^` ranges or bleeding-edge versions (e.g., `eslint@10`, `jest@30`) that are incompatible with the SDK. `expo install --fix` is the authoritative source for compatible versions.
+
+If `expo install --fix` fails due to peer dependency conflicts, run with `--legacy-peer-deps`:
+```bash
+rm -rf node_modules && npm install --legacy-peer-deps
+npx expo install --check
+```
+Then manually fix any remaining mismatches reported by `--check`.
+
+### 3. Verify
+
+Run `npx expo install --check` and confirm zero version mismatches before writing any source code.
+
+---
+
 ## TDD Iron Law (from Superpowers)
 
 **NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.** No exceptions for "simple code" or "obvious implementations."
@@ -66,6 +99,58 @@ These rules are non-negotiable. If you are about to violate any of them, stop an
 13. **NEVER navigate without using the typed `RootStackParamList` navigator.** INSTEAD use `useNavigation<NavigationProp<...>>()` with the correct param list type.
 14. **NEVER mutate state directly.** INSTEAD use the store's action functions or `setState` pattern.
 15. **NEVER skip the `keyExtractor` prop on `FlatList`.** It must always return a stable string ID.
+
+## Asset Scaffolding (BEFORE writing any screen code)
+
+**Every image `require()` in source code must resolve to an actual file.** Missing assets cause Metro bundling failures that block the entire app.
+
+Before writing any screen or component code, create ALL required asset files:
+
+### Step 1 — App Icons & Splash (Expo)
+
+Check `app.json` for `icon`, `splash.image`, `android.adaptiveIcon.foregroundImage`, and any other asset paths. Create a valid placeholder PNG at each path:
+
+```bash
+# Generate a 1x1 pixel colored PNG as placeholder
+node -e "
+const fs = require('fs');
+// Minimal valid PNG (1x1 pixel, colored with primary brand color)
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==', 'base64');
+const paths = ['./assets/icon.png', './assets/splash-icon.png', './assets/adaptive-icon.png'];
+paths.forEach(p => { fs.mkdirSync(require('path').dirname(p), { recursive: true }); fs.writeFileSync(p, png); });
+"
+```
+
+Verify every path in `app.json` resolves. If `app.json` references `./src/assets/icons/app-icon.png`, that file must exist.
+
+### Step 2 — Screen Assets
+
+Scan `02-design.json` for any screens that reference illustrations, onboarding slides, background images, or placeholder images. For each:
+
+1. Create the directory structure under `src/assets/` or `assets/`
+2. Generate a valid placeholder PNG at each path
+3. Name files exactly as they will be referenced in `require()` calls
+
+Common patterns to scaffold:
+- Onboarding slides: `assets/onboarding-slide-{1,2,3}.png`
+- Empty state illustrations: `src/assets/images/empty-*.png`
+- Category/feature icons: `src/assets/icons/*.png`
+- Background images: `src/assets/images/bg-*.png`
+
+### Step 3 — Verify
+
+After creating all assets, verify every path exists:
+
+```bash
+# List all require() calls for images in the codebase
+grep -r "require.*\.\(png\|jpg\|jpeg\|gif\|webp\)" app/ src/ --include="*.tsx" --include="*.ts" -oh | sort -u
+```
+
+Cross-check against actual files. If any `require()` path doesn't resolve, create the file before proceeding.
+
+**NEVER write a `require('path/to/image.png')` in code without first confirming that file exists.**
+
+---
 
 ## Per-Screen TDD Loop
 
@@ -157,7 +242,30 @@ For each store slice in `03-architecture.json`:
 
 ## Navigation
 
-Implement `src/navigation/RootNavigator.tsx`, `AuthNavigator.tsx`, and `MainNavigator.tsx` exactly as specified in `03-architecture.json`. The navigation types in `src/navigation/types.ts` must match `03-architecture.json` exactly.
+**CRITICAL — Follow the routing approach from `03-architecture.json` exactly. Do NOT mix approaches.**
+
+### If using Expo Router (file-based routing):
+
+- `package.json` must have `"main": "expo-router/entry"` — NOT `"main": "index.ts"`
+- Do NOT create `index.ts`, `App.tsx`, or `src/navigation/` — Expo Router handles routing via the `app/` directory
+- Create `app/_layout.tsx` as the root layout (wraps providers, theme, auth gate)
+- Use route groups: `app/(auth)/` for auth screens, `app/(tabs)/` for the tab navigator
+- Each screen is a file in `app/` matching the architecture's route structure
+- Use `<Stack>`, `<Tabs>` from `expo-router` — NOT from `@react-navigation/*` directly
+- Use `useRouter()` and `<Link>` from `expo-router` for navigation — NOT `useNavigation()` from React Navigation
+
+Write an integration test in `__tests__/integration/navigation.test.tsx` that verifies:
+- Unauthenticated users see the auth group screens
+- Authenticated users see the tabs group
+- Deep links resolve to the correct screen
+
+### If using React Navigation (manual setup):
+
+- `package.json` must have `"main": "index.ts"`
+- Create `index.ts` with `registerRootComponent(App)` and `App.tsx` with providers
+- Do NOT create an `app/` directory
+- Implement `src/navigation/RootNavigator.tsx`, `AuthNavigator.tsx`, and `MainNavigator.tsx` exactly as specified in `03-architecture.json`
+- Navigation types in `src/navigation/types.ts` must match `03-architecture.json` exactly
 
 Write an integration test in `__tests__/integration/navigation.test.tsx` that verifies:
 - Unauthenticated users land on the Auth navigator
