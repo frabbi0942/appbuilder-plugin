@@ -27,7 +27,57 @@ Work through every phase. Do not skip any. Record every result precisely — do 
 
 ---
 
-### Phase 1 — Build Verification
+### Phase 1 — Dependency & Build Verification
+
+#### Step 1a — Import-to-Dependency Audit
+
+Scan all source files and config files to verify every third-party import is listed in `package.json`:
+
+1. Check all `import`/`require()` in `src/` for packages not in `dependencies` or `devDependencies`
+2. Check config files: `metro.config.js` (transformers, resolvers), `babel.config.js` (plugins), `next.config.ts` (plugins)
+3. Check `app.json` `plugins` array — every entry must be an installed package that actually exports a config plugin (`app.plugin.js` or equivalent)
+4. Check `jest.config.js` for transformers or presets not in `devDependencies`
+
+For each missing package found, record it as a finding. If ANY import references a package not in `package.json`, mark this step FAIL.
+
+#### Step 1b — Clean Install
+
+Delete `node_modules` and reinstall from scratch to verify the package manifest is self-consistent:
+
+```bash
+rm -rf node_modules
+npm install --legacy-peer-deps 2>&1
+```
+
+If install fails or produces `ERESOLVE` / peer dependency errors (beyond warnings), mark this step FAIL.
+
+**Expo projects:** After install, verify SDK version compatibility:
+```bash
+npx expo install --check 2>&1
+```
+If this reports version mismatches, record every mismatched package. This is a FAIL — the architect specified incompatible versions.
+
+#### Step 1c — Dev Server Boot
+
+Start the dev server and verify it initializes without crashing. This catches config plugin errors, Metro config issues, and module resolution failures that production builds sometimes miss.
+
+**Expo (React Native):**
+```bash
+timeout 30 npx expo start --no-dev --minify 2>&1 || true
+```
+Check the output for: `PluginError`, `Cannot find module`, `SyntaxError`, or any error that prevents the bundler from starting. The server does not need to stay running — you only need to confirm it initializes successfully (look for "Starting Metro Bundler" or the QR code output).
+
+**Next.js:**
+```bash
+timeout 30 npx next dev --port 3999 2>&1 || true
+```
+Check for compilation errors, module not found, or config issues. Look for "Ready" or successful compilation message.
+
+If the dev server fails to boot, mark this step FAIL and record the full error.
+
+After verification, kill any server process that may still be running on the test port.
+
+#### Step 1d — Production Build
 
 Run the production build based on the platform:
 
@@ -57,6 +107,10 @@ If either fails:
 - Do NOT attempt to fix. Report and stop this phase.
 
 Record:
+- Import audit result (missing packages found, if any)
+- Clean install result (success/fail + any warnings)
+- SDK version check result (Expo only)
+- Dev server boot result (success/fail + any errors)
 - Exit codes for both platforms
 - Bundle sizes (iOS and Android `.bundle` files in `dist/`)
 - Any warnings emitted during the build (even if exit code is 0)
@@ -293,7 +347,7 @@ Build passes, tests pass, TypeScript and lint are clean, BUT one or more of:
 
 ### FAIL
 Any one of the following:
-- Phase 1: Any build fails (exit code != 0)
+- Phase 1: Missing imports found, clean install fails, dev server fails to boot, or any production build fails (exit code != 0)
 - Phase 2: Any test failure OR coverage < 70% lines or branches
 - Phase 3: Any TypeScript error
 - Phase 4: Any ESLint error
@@ -314,6 +368,10 @@ Write `06-reviewer-report.json` to the project root:
   "phases": {
     "build": {
       "status": "PASS|FAIL",
+      "import_audit": "PASS|FAIL",
+      "clean_install": "PASS|FAIL",
+      "sdk_version_check": "PASS|FAIL|N_A",
+      "dev_server_boot": "PASS|FAIL",
       "ios_exit_code": null,
       "android_exit_code": null,
       "ios_bundle_size_kb": null,

@@ -63,6 +63,21 @@ AppBuilder: Ready. Use /appbuilder-build "your app idea" to create your first ap
 claude plugin validate /path/to/appbuilder-plugin
 ```
 
+## Figma Integration
+
+AppBuilder has built-in Figma support via the [Figma MCP](https://www.figma.com/developers). When detected, it unlocks visual design generation alongside code:
+
+- **Design Studio** generates a complete Figma file — design tokens, reusable components with variants, and screen layouts for every MVP screen
+- **Assets** generates app icons, splash screens, and store screenshots directly in Figma for easy export
+- **Code Connect** links Figma components to their code file paths for bidirectional design-code sync
+- **From Figma** — pass `--from-figma` with a Figma URL to extract an existing design as a starting point
+
+When Figma MCP is available, the build pipeline will ask:
+
+> "Figma MCP detected. Would you like me to generate visual mockups in Figma? (Y/n)"
+
+No Figma account? No problem — the pipeline works without it. Design tokens and screen specs are always generated as JSON regardless.
+
 ## Commands
 
 | Command | What It Does |

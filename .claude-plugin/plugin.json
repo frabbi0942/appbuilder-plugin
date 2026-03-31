@@ -1,7 +1,7 @@
 {
   "name": "appbuilder",
   "description": "Ship apps, not invoices — generate production-quality mobile, web, and extension apps from natural language using a 6-agent pipeline with TDD, security hardening, and design systems.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Fazlay Rabbi",
     "email": "hello@charmdeal.com"

@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Ship apps, not invoices. AI-powered app builder plugin for Claude Code.",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "plugins": [
     {

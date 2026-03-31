@@ -144,6 +144,11 @@ List every npm package required with:
 - Purpose (one sentence)
 - Whether it is a `dependency` or `devDependency`
 
+**Version Pinning Rules:**
+- **Expo projects:** All `expo-*` packages and React Native community packages MUST use `~` (tilde) ranges pinned to the versions compatible with the chosen Expo SDK. Do NOT use `^` (caret) ranges for these — Expo SDK versions are tightly coupled with specific package versions. Run `npx expo install --check` mentally or use Context7 to verify the correct version for each package against the SDK version.
+- **Next.js projects:** Pin `next`, `react`, and `react-dom` to compatible versions. Use `~` for tightly-coupled packages (e.g., `@next/font`, `eslint-config-next`).
+- **All projects:** Verify that every Expo config plugin listed in `app.json` actually ships a plugin export in the specified package version. If a package does not have an `app.plugin.js` or plugin export, do NOT add it to the `plugins` array — use its React provider pattern instead.
+
 Categories to cover:
 - Navigation (e.g., `@react-navigation/native`, `@react-navigation/bottom-tabs`, `@react-navigation/stack`)
 - State management (choose ONE from: Zustand, Redux Toolkit, Jotai, or Context+useReducer — justify the choice based on app complexity from `01-plan.json`)

@@ -300,7 +300,44 @@ After all screens are built, write `docs/04-build-log.md` containing:
 
 ## Final Verification
 
-After all screens, components, store slices, and navigation are complete, run the full suite:
+After all screens, components, store slices, and navigation are complete:
+
+### Step 0 — Import-to-Dependency Audit
+
+Before running any build commands, verify that every package imported in source code is listed in `package.json`:
+
+1. Scan all `import` and `require()` statements in `src/`, config files (`metro.config.js`, `babel.config.js`, `app.json` plugins, `next.config.ts`, etc.)
+2. For each third-party package referenced (not relative paths, not Node built-ins), confirm it exists in `dependencies` or `devDependencies`
+3. Also check `app.json` `plugins` array — every entry must be an installed package that actually exports a config plugin
+
+If ANY imported package is missing from `package.json`:
+- Add it with the correct version (use `~` for Expo ecosystem packages, `^` for others)
+- Run `npm install --legacy-peer-deps` after adding
+
+Common culprits: SVG transformers referenced in `metro.config.js`, icon libraries used in components, config plugins in `app.json` that aren't installed.
+
+### Step 1 — Clean Install
+
+Delete `node_modules` and reinstall to verify the package manifest works from scratch:
+
+```bash
+rm -rf node_modules
+npm install --legacy-peer-deps
+```
+
+**Expo projects:** Run `npx expo install --check` and fix any version mismatches before proceeding. All `expo-*` and React Native community packages must be compatible with the chosen SDK version.
+
+### Step 2 — Dev Server Boot
+
+Verify the dev server starts without errors:
+
+**Expo:** `npx expo start` — confirm Metro bundler initializes (no `PluginError`, `Cannot find module`, or `SyntaxError`). Kill the server after confirming.
+
+**Next.js:** `npx next dev` — confirm "Ready" message appears. Kill after confirming.
+
+If the dev server fails, fix the root cause (missing dependency, bad config plugin, Metro config issue) before proceeding.
+
+### Step 3 — Full Test Suite
 
 ```bash
 npx jest --coverage
