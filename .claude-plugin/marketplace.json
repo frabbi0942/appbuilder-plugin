@@ -1,0 +1,33 @@
+{
+  "name": "appbuilder-marketplace",
+  "owner": {
+    "name": "Fazlay Rabbi",
+    "email": "hello@charmdeal.com"
+  },
+  "metadata": {
+    "description": "Ship apps, not invoices. AI-powered app builder plugin for Claude Code.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "appbuilder",
+      "source": {
+        "source": "github",
+        "repo": "frabbi0942/appbuilder-plugin"
+      },
+      "description": "Generate production-quality mobile, web, and extension apps from natural language — 6-agent pipeline with TDD, design systems, security hardening, and AI slop detection.",
+      "category": "code-generation",
+      "tags": [
+        "app-builder",
+        "expo",
+        "react-native",
+        "nextjs",
+        "chrome-extension",
+        "tdd",
+        "design-system",
+        "security",
+        "multi-agent"
+      ]
+    }
+  ]
+}

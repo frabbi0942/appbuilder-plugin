@@ -1,18 +1,25 @@
 {
   "name": "appbuilder",
-  "description": "AI-powered app builder — generate production-quality mobile, web, and extension apps from natural language using a 6-agent pipeline.",
+  "description": "Ship apps, not invoices — generate production-quality mobile, web, and extension apps from natural language using a 6-agent pipeline with TDD, security hardening, and design systems.",
   "version": "1.0.0",
   "author": {
-    "name": "Fazlay Rabbi"
+    "name": "Fazlay Rabbi",
+    "email": "hello@charmdeal.com"
   },
+  "homepage": "https://github.com/frabbi0942/appbuilder-plugin",
+  "repository": "https://github.com/frabbi0942/appbuilder-plugin",
   "license": "MIT",
   "keywords": [
     "app-builder",
     "expo",
     "react-native",
     "nextjs",
+    "chrome-extension",
+    "safari-extension",
     "code-generation",
-    "design-to-code",
+    "design-system",
+    "tdd",
+    "security-audit",
     "multi-agent"
   ]
 }

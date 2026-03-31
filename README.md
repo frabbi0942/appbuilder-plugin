@@ -8,25 +8,57 @@ You describe the app. Six AI agents build it. You own 100% of the code.
 
 ## Install
 
-```bash
-# Clone the plugin
-git clone https://github.com/frabbi0942/appbuilder-plugin.git
+### From the marketplace (recommended)
 
-# Run Claude Code with the plugin
+Inside Claude Code, run:
+
+```
+/plugin marketplace add frabbi0942/appbuilder-plugin
+/plugin install appbuilder@appbuilder-marketplace
+```
+
+Auto-updates included. When the plugin updates on GitHub, you get the latest version automatically.
+
+### From GitHub directly
+
+```bash
+git clone https://github.com/frabbi0942/appbuilder-plugin.git
 claude --plugin-dir /path/to/appbuilder-plugin
 ```
+
+**Tip:** Add a shell alias:
+```bash
+alias claude-ab='claude --plugin-dir /path/to/appbuilder-plugin'
+```
+
+### For teams
+
+Add to your repo's `.claude/settings.json` so every team member gets AppBuilder automatically:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "appbuilder-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "frabbi0942/appbuilder-plugin"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "appbuilder@appbuilder-marketplace": true
+  }
+}
+```
+
+### Verify
 
 You'll see:
 ```
 AppBuilder: Ready. Use /appbuilder-build "your app idea" to create your first app.
 ```
 
-**Tip:** Add a shell alias so you don't type the path every time:
-```bash
-alias claude-ab='claude --plugin-dir /path/to/appbuilder-plugin'
-```
-
-**Validate the plugin** (optional):
+**Validate** (optional):
 ```bash
 claude plugin validate /path/to/appbuilder-plugin
 ```
@@ -44,7 +76,7 @@ claude plugin validate /path/to/appbuilder-plugin
 
 ## How It Works
 
-You describe your app. AppBuilder runs a 6-agent pipeline that does everything an agency would — except it takes minutes, not months.
+You describe your app. AppBuilder runs a 6-agent pipeline that does everything a dev shop would, but better.
 
 ```
 You: "Build a habit tracker with streaks and social accountability"
@@ -134,7 +166,7 @@ Cached artifacts in `.appbuilder/cache/` mean iterations use fewer tokens and co
 
 ## Generated Artifacts
 
-Every build produces documentation that agencies would charge extra for:
+Every build produces documentation for reference:
 
 ```
 your-app/
