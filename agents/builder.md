@@ -293,6 +293,59 @@ Write a test that asserts all token values match the spec in `02-design.json` (r
 - Navigation: lazy loading for tab screens
 - Storage: expo-secure-store for secrets, MMKV for general state
 
+## Expo Go Runtime Compatibility (when `build_mode: "expo-go"`)
+
+Many libraries ship APIs that look like normal JS imports but crash at runtime because they require native TurboModules or worklets not available in Expo Go. **Always use the Expo Go-safe alternative.**
+
+### react-native-reanimated
+Reanimated is included in Expo Go, but ONLY its core animation APIs work. These APIs crash with `Exception in HostFunction`:
+- `useReducedMotion()` — use `AccessibilityInfo.isReduceMotionEnabled()` from `react-native` instead
+- `useFrameCallback()` — requires native worklets, not available in Expo Go
+- `runOnUI()` / `runOnJS()` in complex chains — keep animations simple with `useAnimatedStyle` + `withSpring`/`withTiming`
+- Custom worklets with `'worklet'` directive — only basic ones work
+
+**Safe Reanimated APIs (work in Expo Go):**
+- `useSharedValue`, `useAnimatedStyle`, `withSpring`, `withTiming`, `withDelay`, `withSequence`, `withRepeat`
+- `Animated.View`, `Animated.Text`, `Animated.ScrollView`
+- `interpolate`, `Extrapolation`
+- `FadeIn`, `FadeOut`, `SlideInRight`, `SlideOutLeft` (layout animations)
+- `useAnimatedScrollHandler`
+
+### react-native-mmkv
+MMKV requires native modules. In Expo Go mode, use `expo-secure-store` for sensitive data and `AsyncStorage` from `@react-native-async-storage/async-storage` for general persistence. Only use MMKV when `build_mode: "dev-build"`.
+
+### General Rule
+Before using ANY API from a native library, ask: "Does this require a TurboModule, HostFunction, or native worklet?" If yes, find the pure-JS or Expo SDK alternative. If unsure, check via Context7 or the library's Expo Go compatibility docs.
+
+## Responsive Layout Rules
+
+All screens MUST render correctly across device sizes. Never hardcode dimensions that assume a specific screen.
+
+### Mobile (Expo / React Native):
+- Use `flex: 1` and percentage-based layouts — never hardcode widths like `width: 375`
+- Use `useWindowDimensions()` from `react-native` when you need screen-aware calculations
+- Test mental model: layouts must work on iPhone SE (375×667), standard (393×852), and Pro Max (430×932)
+- Bottom CTAs must respect safe areas — wrap with `SafeAreaView` or use `useSafeAreaInsets()` from `react-native-safe-area-context`
+- Text must not clip — use `numberOfLines` + `ellipsizeMode` for constrained areas, or let text wrap
+- Horizontal lists/carousels must use `FlatList` with `horizontal` — never fixed-width item arrays that overflow on small screens
+- Modals and bottom sheets must not extend beyond screen bounds on any device
+- Keyboard-aware: forms must use `KeyboardAvoidingView` or `@gorhom/bottom-sheet`'s built-in keyboard handling so inputs aren't hidden behind the keyboard
+- Status bar and notch: use `expo-status-bar` and safe area insets — never position content under the notch or dynamic island
+
+### Web (Next.js):
+- All pages MUST be mobile-responsive — test at 375px, 768px, and 1280px widths
+- Use Tailwind responsive prefixes: `sm:`, `md:`, `lg:` — never write desktop-only layouts
+- Navigation must collapse to a hamburger menu or sheet on mobile (`sm:hidden` / `md:flex`)
+- Touch targets must be at least 44px on mobile — don't rely on hover states as the only interaction
+- Forms must stack vertically on mobile — no side-by-side inputs below `md:`
+- Tables must either scroll horizontally on mobile or transform to a card layout
+- Images must use responsive sizing (`w-full max-w-*`) — never fixed pixel widths that overflow on mobile
+- Font sizes must be readable on mobile — minimum 16px body text to prevent iOS auto-zoom on input focus
+
+### Chrome/Safari Extensions:
+- Popup width is fixed (typically 400px) — design within this constraint
+- Options page should be responsive like a regular web page
+
 ## Integration Standards
 
 Follow the integration choices from `03-architecture.json` exactly. The architect has already chosen the SDKs, versions, and patterns. Do not substitute or add new integrations — implement what was specified.

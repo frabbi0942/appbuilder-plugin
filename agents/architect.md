@@ -242,6 +242,7 @@ Expo Go-compatible alternatives:
 | Auth | `expo-auth-session` + `expo-web-browser` | native Firebase Auth |
 | Biometrics | `expo-local-authentication` | react-native-biometrics |
 | Secure storage | `expo-secure-store` | react-native-keychain |
+| General storage | `@react-native-async-storage/async-storage` | react-native-mmkv |
 | SQLite | `expo-sqlite` | react-native-sqlite-storage |
 
 **If `build_mode: "dev-build"`:**
@@ -257,7 +258,7 @@ Categories to cover:
 - Navigation (e.g., `@react-navigation/native`, `@react-navigation/bottom-tabs`, `@react-navigation/stack`)
 - State management (choose ONE from: Zustand, Redux Toolkit, Jotai, or Context+useReducer — justify the choice based on app complexity from `01-plan.json`)
 - Data fetching / server state (TanStack Query if there is a backend; omit if local-only)
-- Storage (AsyncStorage, MMKV, or SQLite — justify choice based on data model complexity)
+- Storage (AsyncStorage or SQLite for Expo Go mode; MMKV only for dev-build mode — MMKV requires native modules. Use `expo-secure-store` for sensitive data, `@react-native-async-storage/async-storage` for general persistence)
 - Authentication (if applicable: Supabase, Firebase, or custom JWT — prefer `expo-auth-session` for Expo Go compatibility)
 - Forms (React Hook Form if there are 3+ form screens; plain controlled inputs otherwise)
 - Animation (Reanimated 3 + Gesture Handler if the design has custom animations; Animated API if not)

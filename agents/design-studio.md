@@ -122,7 +122,13 @@ For each screen in the MVP:
    - **empty**: illustration description, title, subtitle, primary action CTA, tone
    - **error**: by type (network/server/auth/not-found), title, subtitle, retry action
    - **offline**: strategy (cached-data/offline-banner/full-offline-screen)
-8. **Responsive** — tablet layout, landscape behavior
+8. **Responsive** — every screen spec must define layout behavior at multiple sizes:
+   - **Mobile small** (375px / iPhone SE): how content reflows, what gets truncated, minimum touch targets
+   - **Mobile standard** (393px): primary design target
+   - **Mobile large** (430px / Pro Max): how extra space is used (wider margins, not just stretched elements)
+   - **Tablet** (768px+): multi-column layout, sidebar behavior, split-view candidates
+   - **Landscape**: which screens support landscape, content reflow rules
+   - For each screen, specify: flex-based layout (not fixed widths), safe area handling (notch/dynamic island/home indicator), keyboard avoidance strategy for forms
 9. **Transitions** — from/to with shared element candidates
 
 **Copy Quality Principles (from Stop-Slop):**
@@ -132,11 +138,16 @@ For each screen in the MVP:
 - Empty states inspire action: they include an illustration concept, a headline, and a primary CTA
 - No jargon, no gerunds in headlines ("Tracking" → "Track your habits")
 
-**Web-Specific (Next.js):**
+**Web-Specific (Next.js) — MUST be mobile-first:**
 - Responsive breakpoints: mobile (< 640px), tablet (640-1024px), desktop (> 1024px)
-- Layout: sidebar nav on desktop, bottom nav on mobile, hamburger on tablet
-- Scrolling: native browser scroll (no custom scrollbars), sticky header behavior
-- Forms: inline validation, autofocus first field, keyboard submit
+- **Design mobile-first**: default styles target 375px width, then layer up with `sm:`, `md:`, `lg:` breakpoints
+- Layout: sidebar nav on desktop, bottom nav or hamburger on mobile
+- Navigation: collapse to sheet/drawer on mobile — never leave desktop nav visible on small screens
+- Tables: specify mobile treatment (horizontal scroll, or transform to card/stack layout)
+- Forms: stack vertically on mobile, inline validation, autofocus first field, minimum 16px input font (prevents iOS auto-zoom)
+- Images: responsive sizing with aspect ratios — never fixed pixel widths
+- Touch targets: 44px minimum on mobile — hover-only interactions must have tap alternatives
+- Scrolling: native browser scroll, sticky header behavior
 - SEO: metadata structure, OG image spec, semantic HTML hierarchy
 
 **Extension-Specific (Chrome/Safari):**
