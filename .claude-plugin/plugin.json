@@ -1,0 +1,18 @@
+{
+  "name": "appbuilder",
+  "description": "AI-powered app builder — generate production-quality mobile, web, and extension apps from natural language using a 6-agent pipeline.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fazlay Rabbi"
+  },
+  "license": "MIT",
+  "keywords": [
+    "app-builder",
+    "expo",
+    "react-native",
+    "nextjs",
+    "code-generation",
+    "design-to-code",
+    "multi-agent"
+  ]
+}

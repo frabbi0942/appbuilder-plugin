@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "expo": {
+      "type": "http",
+      "url": "https://mcp.expo.dev"
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-playwright@latest"]
+    }
+  }
+}
