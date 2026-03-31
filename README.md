@@ -74,3 +74,9 @@ Inspired by and credited to:
 - [web-quality-skills](https://github.com/addyosmani/web-quality-skills) — Core Web Vitals budgets
 - [agent-skills](https://github.com/callstackincubator/agent-skills) — React Native performance
 - [trailofbits/skills](https://github.com/trailofbits/skills) — Supply chain security
+
+## Support
+
+If this plugin saves you time, consider supporting development:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=flat&logo=buy-me-a-coffee)](https://buymeacoffee.com/fazlayrabbi)
