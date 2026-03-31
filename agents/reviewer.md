@@ -1,17 +1,6 @@
 ---
 name: reviewer
-description: >
-  Final verification agent. Builds the app, runs the full test suite, checks TypeScript
-  and lint cleanliness, verifies design fidelity against the spec, and cross-validates
-  builder tests against hardener findings. Reports a verdict of PASS, FAIL, or
-  PASS-WITH-WARNINGS. Does NOT fix anything. Always the last agent in the pipeline.
-
-  <example>
-  User: "Hardener is done. Now do the final review."
-  → Spawn the reviewer agent. It runs build, test, typecheck, lint, spot-checks design
-    fidelity, cross-validates the hardener report, and produces 06-reviewer-report.json
-    with a final verdict before any deployment.
-  </example>
+description: "Final verification — runs build/test/lint, reports PASS/FAIL/WARNINGS. Never auto-fixes. Outputs 06-reviewer-report.json."
 model: sonnet
 ---
 

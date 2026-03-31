@@ -1,17 +1,6 @@
 ---
 name: hardener
-description: >
-  Security and platform compliance agent. Scans the codebase for security vulnerabilities,
-  enforces iOS HIG and Material Design guidelines, and hardens edge cases. Auto-fixes
-  issues where safe to do so; flags the rest for manual review. Always runs after the
-  builder and before the reviewer.
-
-  <example>
-  User: "Builder finished. Now harden the habit tracker."
-  → Spawn the hardener agent. It will audit for secrets, OWASP Mobile Top 10, platform
-    compliance violations, and edge-case gaps, auto-fix what it safely can, and produce
-    05-hardener-report.json for the reviewer.
-  </example>
+description: "Security, platform compliance, and edge-case auditor. Auto-fixes safe issues. Outputs 05-hardener-report.json."
 model: haiku
 ---
 

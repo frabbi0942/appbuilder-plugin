@@ -30,7 +30,7 @@ The core product is a sequential 6-agent pipeline orchestrated by the `/appbuild
 Planner (sonnet) → Design Studio (sonnet) → [User Review Gate] → Architect (sonnet) → Builder (sonnet, per-screen subagents) → Hardener (haiku, 4 parallel) → Reviewer (sonnet)
 ```
 
-- **Planner** — Asks 6 structured questions, produces `01-plan.json`
+- **Planner** — Orchestrator asks 6 questions interactively (one at a time), then planner agent synthesizes answers + competitor research into `01-plan.json`
 - **Design Studio** — 8-phase design system, produces `02-design.json` + Coder Rulebook
 - **User Review Gate** — Blocking approval loop (max 5 revisions)
 - **Architect** — File structure, deps, nav graph, data model → `03-architecture.json`

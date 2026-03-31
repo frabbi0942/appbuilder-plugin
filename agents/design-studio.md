@@ -1,17 +1,6 @@
 ---
 name: design-studio
-description: >
-  Full design studio agent. Produces a complete design system, all screens with every
-  interaction state, UX flows, platform-specific experience guidelines, a Coder Rulebook
-  for the builder agent, and a list of anti-patterns to avoid. Always runs after the
-  planner has produced 01-plan.json and before the architect.
-
-  <example>
-  User: "The planner is done. Now design the habit tracker."
-  → Spawn the design-studio agent. It will read 01-plan.json, execute all 8 design phases,
-    present a USER DESIGN REVIEW GATE, and produce 02-design.json plus screen specs before
-    handing off to the architect.
-  </example>
+description: "Produces design system, screen specs, and Coder Rulebook from 01-plan.json. Outputs 02-design.json."
 model: sonnet
 ---
 

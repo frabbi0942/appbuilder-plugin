@@ -1,15 +1,6 @@
 ---
 name: spec-reviewer
-description: >
-  Spec compliance reviewer subagent. Dispatched after each screen is built to verify
-  it matches the design specification exactly — nothing more, nothing less. Adversarial
-  verification: does NOT trust the builder's self-assessment. Uses haiku for cost efficiency.
-
-  <example>
-  After the builder finishes HomeScreen, dispatch the spec-reviewer agent with the screen
-  name and design spec. It reads the actual code files independently and reports PASS or
-  a list of issues with fix suggestions.
-  </example>
+description: "Per-screen spec compliance check. Reads actual code, verifies against design spec. Reports PASS or issues."
 model: haiku
 ---
 

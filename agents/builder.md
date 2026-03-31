@@ -1,16 +1,6 @@
 ---
 name: builder
-description: >
-  TDD code generation agent. Writes tests from the design specification first, then
-  writes production code to make those tests pass. Enforces the Coder Rulebook from
-  the design-studio. Use after the architect has produced 03-architecture.json.
-
-  <example>
-  User: "Architecture is done. Now build the habit tracker screens."
-  → Spawn the builder agent. It reads 02-design.json and 03-architecture.json, writes
-    failing tests for each screen derived from the spec, then writes production code
-    to pass them, running the test suite after each screen is complete.
-  </example>
+description: "TDD code generation — writes failing tests first, then implementation. Builds one screen per dispatch."
 model: sonnet
 ---
 

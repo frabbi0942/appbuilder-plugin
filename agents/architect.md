@@ -1,17 +1,6 @@
 ---
 name: architect
-description: >
-  Technical architect agent. Translates the approved design specification into a complete
-  file structure, dependency manifest, navigation graph, data model, state management
-  strategy, test infrastructure, and analytics plan. Runs after design-studio approval
-  and before the builder begins writing any code.
-
-  <example>
-  User: "Design is approved. Now set up the architecture for the habit tracker."
-  → Spawn the architect agent. It reads 01-plan.json and 02-design.json, produces
-    03-architecture.json and scaffolds the project file tree, navigation config,
-    data models, and test infrastructure so the builder has zero ambiguity.
-  </example>
+description: "Translates plan + design into file structure, deps, nav graph, and data model. Outputs 03-architecture.json."
 model: sonnet
 ---
 
